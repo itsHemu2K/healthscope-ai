@@ -21,12 +21,23 @@ healthcare KPIs, and exposing insights through APIs and interactive dashboards.
 
 ## Status
 
-Initial project setup is in progress. The first milestone targets a complete local
-development environment, three live healthcare data sources, REST APIs, dashboard
-visualizations, automated tests, and architecture documentation.
+Phase 1 is in progress. The repository includes a typed FastAPI service, a
+versioned health endpoint, automated backend quality checks, and a PostgreSQL
+development container. The first milestone targets three live healthcare data
+sources, REST APIs, dashboard visualizations, and architecture documentation.
+
+## Quick start
+
+With Docker installed:
+
+```bash
+docker compose up --build
+```
+
+Then open `http://localhost:8000/docs` or check
+`http://localhost:8000/api/v1/health`.
 
 ## Data policy
 
 Only live, publicly available healthcare datasets are used. No fabricated CSV
 datasets or patient-level protected health information belong in this repository.
-
