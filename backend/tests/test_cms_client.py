@@ -90,6 +90,23 @@ def test_fetch_hospitals_validates_and_maps_live_cms_fields() -> None:
     assert page.source.retrieved_at.tzinfo is not None
 
 
+def test_cms_client_reuses_and_closes_workflow_connection_pool() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, json={"results": [cms_record()], "count": 1})
+
+    client = build_client(handler)
+
+    async def fetch_in_workflow() -> None:
+        assert await client.__aenter__() is client
+        assert await client.__aenter__() is client
+        page = await client.fetch_hospitals(limit=1, offset=0)
+        assert page.total == 1
+        await client.__aexit__()
+        await client.__aexit__()
+
+    asyncio.run(fetch_in_workflow())
+
+
 def test_fetch_hospitals_maps_timeout_to_domain_error() -> None:
     def handler(request: httpx.Request) -> httpx.Response:
         raise httpx.ReadTimeout("CMS took too long", request=request)

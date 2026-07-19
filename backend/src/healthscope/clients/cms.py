@@ -101,6 +101,30 @@ class CMSClient:
         self._dataset_id = dataset_id
         self._timeout_seconds = timeout_seconds
         self._transport = transport
+        self._client: httpx.AsyncClient | None = None
+
+    def _build_http_client(self) -> httpx.AsyncClient:
+        """Build an HTTP client with the CMS transport policy."""
+
+        return httpx.AsyncClient(
+            timeout=self._timeout_seconds,
+            transport=self._transport,
+            headers={"User-Agent": "HealthScope-AI/0.1"},
+        )
+
+    async def __aenter__(self) -> "CMSClient":
+        """Keep one connection pool open across a multi-page workflow."""
+
+        if self._client is None:
+            self._client = self._build_http_client()
+        return self
+
+    async def __aexit__(self, *_exc_info: object) -> None:
+        """Close the workflow-scoped connection pool."""
+
+        if self._client is not None:
+            await self._client.aclose()
+            self._client = None
 
     async def fetch_hospitals(self, *, limit: int, offset: int) -> HospitalPage:
         """Fetch and validate one page of CMS Hospital General Information."""
@@ -114,13 +138,12 @@ class CMSClient:
             "format": "json",
         }
         try:
-            async with httpx.AsyncClient(
-                timeout=self._timeout_seconds,
-                transport=self._transport,
-                headers={"User-Agent": "HealthScope-AI/0.1"},
-            ) as client:
-                response = await client.get(url, params=params)
-                response.raise_for_status()
+            if self._client is None:
+                async with self._build_http_client() as client:
+                    response = await client.get(url, params=params)
+            else:
+                response = await self._client.get(url, params=params)
+            response.raise_for_status()
         except httpx.TimeoutException as exc:
             raise CMSUpstreamTimeoutError from exc
         except (httpx.RequestError, httpx.HTTPStatusError) as exc:

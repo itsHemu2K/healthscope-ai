@@ -42,6 +42,33 @@ alembic upgrade head
 Docker Compose supplies the container database URL and applies pending
 migrations automatically when the API container starts.
 
+## Hospital snapshot ingestion
+
+After applying migrations, run the explicit one-shot command to retrieve every
+current record from the official CMS Hospital General Information dataset:
+
+```bash
+healthscope-ingest-hospitals
+```
+
+With Docker Compose, start PostgreSQL and run the same packaged command:
+
+```bash
+docker compose up -d database
+docker compose run --rm api healthscope-ingest-hospitals
+```
+
+The command uses one UTC retrieval timestamp for the entire snapshot, validates
+that CMS pagination remains consistent, and commits pages in bounded batches.
+Same-day reruns are idempotent and can safely resume a partially completed run.
+It prints a JSON summary containing expected, fetched, and upserted counts; a
+source, validation, or database failure returns exit code 1 with a JSON error on
+standard error. Configure page size with
+`HEALTHSCOPE_CMS_INGESTION_PAGE_SIZE` (1–100, default 100). Transient CMS
+timeouts and HTTP failures use bounded exponential retries; configure them with
+`HEALTHSCOPE_CMS_INGESTION_MAX_ATTEMPTS` (default 3) and
+`HEALTHSCOPE_CMS_INGESTION_RETRY_DELAY_SECONDS` (default 1).
+
 ## Quality checks
 
 ```bash

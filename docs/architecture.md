@@ -15,6 +15,11 @@ application behavior, and storage can evolve independently.
    source dataset, UTC snapshot date, and facility ID.
 4. Alembic owns all database schema changes. Application startup does not call
    `create_all`; deployment or Docker Compose applies versioned migrations.
+5. A separate one-shot ingestion command pages the complete CMS dataset, uses
+   one UTC timestamp for the run, and commits idempotent pages independently so
+   a failed run can be safely retried without coupling ETL to API startup. The
+   command reuses one HTTP connection pool and retries transient CMS failures
+   with bounded exponential backoff.
 
 ## Current deployment boundary
 
@@ -25,8 +30,7 @@ provided through environment variables rather than committed configuration.
 
 ## Next boundary
 
-The next increment should add an explicit ingestion service or CLI command that
-pages through the live CMS dataset, assigns one retrieval timestamp to the full
-run, writes batches through the idempotent repository, and reports counts and
-failures. That service can later be scheduled without embedding ETL work in API
-startup.
+The next increment should expose stored hospital snapshot status and history
+through typed read APIs, including latest snapshot date and basic state-level
+coverage counts. Scheduling remains separate from API startup and can be added
+after the ingestion command has production runtime monitoring.

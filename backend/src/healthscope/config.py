@@ -28,6 +28,9 @@ class Settings(BaseSettings):
     )
     cms_hospital_dataset_id: str = Field(default="xubh-q36u", pattern=r"^[a-z0-9]+-[a-z0-9]+$")
     cms_request_timeout_seconds: float = Field(default=10.0, gt=0, le=30)
+    cms_ingestion_page_size: int = Field(default=100, ge=1, le=100)
+    cms_ingestion_max_attempts: int = Field(default=3, ge=1, le=10)
+    cms_ingestion_retry_delay_seconds: float = Field(default=1.0, ge=0, le=60)
 
 
 @lru_cache
