@@ -9,6 +9,8 @@ WORKDIR /app
 RUN addgroup --system healthscope && adduser --system --ingroup healthscope healthscope
 
 COPY pyproject.toml README.md ./
+COPY alembic.ini ./
+COPY alembic ./alembic
 COPY src ./src
 RUN python -m pip install --upgrade pip && python -m pip install .
 

@@ -19,6 +19,9 @@ class Settings(BaseSettings):
     environment: str = Field(default="development", pattern=r"^[a-z][a-z0-9_-]*$")
     api_prefix: str = "/api/v1"
     debug: bool = False
+    database_url: str = (
+        "postgresql+psycopg://healthscope:healthscope-local-only@localhost:5432/healthscope"
+    )
     cms_provider_data_base_url: str = Field(
         default="https://data.cms.gov/provider-data/api/1",
         pattern=r"^https://",
