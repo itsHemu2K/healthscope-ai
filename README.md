@@ -22,9 +22,10 @@ healthcare KPIs, and exposing insights through APIs and interactive dashboards.
 ## Status
 
 Phase 1 is in progress. The repository includes a typed FastAPI service, a
-versioned health endpoint, automated backend quality checks, and a PostgreSQL
-development container. The first milestone targets three live healthcare data
-sources, REST APIs, dashboard visualizations, and architecture documentation.
+versioned health endpoint, a paginated live CMS Hospital General Information
+endpoint, automated backend quality checks, and a PostgreSQL development
+container. The first milestone targets three live healthcare data sources, REST
+APIs, dashboard visualizations, and architecture documentation.
 
 ## Quick start
 

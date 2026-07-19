@@ -1,15 +1,12 @@
 """Service health endpoints."""
 
-from typing import Annotated
-
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, status
 
 from healthscope import __version__
-from healthscope.config import Settings, get_settings
+from healthscope.api.dependencies import SettingsDependency
 from healthscope.schemas.health import HealthResponse
 
 router = APIRouter(tags=["system"])
-SettingsDependency = Annotated[Settings, Depends(get_settings)]
 
 
 @router.get(
