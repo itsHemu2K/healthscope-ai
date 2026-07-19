@@ -5,12 +5,12 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+from alembic.config import Config
 from sqlalchemy import create_engine, func, inspect, select
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.orm import Session
 
 from alembic import command
-from alembic.config import Config
 from healthscope.config import Settings
 from healthscope.database import (
     Base,
@@ -120,7 +120,7 @@ def test_upsert_builder_compiles_for_postgresql_and_rejects_unknown_dialect() ->
 
     assert "ON CONFLICT" in sql
     assert "source_dataset_id" in sql
-    with pytest.raises(ValueError, match="Unsupported.*mysql"):
+    with pytest.raises(ValueError, match=r"Unsupported.*mysql"):
         _upsert_statement(table, values, "mysql")
 
 
